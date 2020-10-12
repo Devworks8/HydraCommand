@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+
 namespace HydraCommand
 {
     public class HydraBot
@@ -60,7 +61,7 @@ namespace HydraCommand
                 input = Console.ReadLine();
                 string[] command = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
                     
-                invoker.SetCommand(validCommands[command[0].ToLower()]);
+                invoker.SetCommand(validCommands[command[0].ToLower()], command);
                 invoker.ExecuteCommand();
             }
         }

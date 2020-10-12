@@ -25,7 +25,7 @@ namespace HydraCommand
     // The Receiver is the object that has an action to be executed from the Command.
     public class Receiver
     {
-        public void quit() => Environment.Exit(0);
-
+        public void quit(string[] args) => Environment.Exit(0);
+        
     }
 }

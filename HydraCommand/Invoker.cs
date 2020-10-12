@@ -26,12 +26,14 @@ namespace HydraCommand
     public class Invoker
     {
         private Command _command;
+        private string[] _args;
 
-        public void SetCommand(Command command)
+        public void SetCommand(Command command, string[] args)
         {
             this._command = command;
+            this._args = args;
         }
 
-        public void ExecuteCommand() => _command.Execute();
+        public void ExecuteCommand() => _command.Execute(_args);
     }
 }

@@ -31,12 +31,14 @@ namespace HydraCommand
             this.Receiver = receiver;
         }
 
-        public abstract void Execute();
+        public abstract void Execute(string[] args);
     }
 
     public class quit : Command
     {
         public quit(Receiver receiver) : base(receiver) { }
-        public override void Execute() => Receiver.quit();
+        public override void Execute(string[] args) => Receiver.quit(args);
     }
+
+    
 }
