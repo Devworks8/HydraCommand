@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 namespace HydraCommand
 {
-    public class HydroBot
+    public class HydraBot
     {
         Receiver r = new Receiver();
         Invoker invoker = new Invoker();

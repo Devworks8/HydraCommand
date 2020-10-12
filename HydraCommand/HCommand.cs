@@ -27,7 +27,7 @@ namespace HydraCommand
     {
         public static void Main(string[] args)
         {
-            HydroBot bot = new HydroBot();
+            HydraBot bot = new HydraBot();
             bot.run();
         }
     }
