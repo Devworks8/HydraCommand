@@ -2,9 +2,9 @@
 //  HydroBot.cs
 //
 //  Author:
-//       souljourner <lachapellec@gmail.com>
+//       Christian Lachapelle <lachapellec@gmail.com>
 //
-//  Copyright (c) 2020 ${CopyrightHolder}
+//  Copyright (c) 2020 Devworks8
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
