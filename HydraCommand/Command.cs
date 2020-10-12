@@ -22,7 +22,9 @@
 using System;
 namespace HydraCommand
 {
-    // The Command executes the action from a Receiver.
+    /// <summary>
+    /// The class <c>Command</c> executes the action from a <c>Receiver</c> class.
+    /// </summary>
     abstract public class Command
     {
         protected Receiver Receiver;
@@ -34,6 +36,16 @@ namespace HydraCommand
         public abstract void Execute(string[] args);
     }
 
+    /// <summary>
+    /// The following classes constitute the commands.
+    /// <list type="bullet">
+    ///<item>
+    ///<description>
+    ///<c>quit</c> => Exit the appliation
+    ///</description>
+    ///</item>
+    /// </list>
+    /// </summary>
     public class quit : Command
     {
         public quit(Receiver receiver) : base(receiver) { }

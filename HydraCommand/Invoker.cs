@@ -22,7 +22,10 @@
 using System;
 namespace HydraCommand
 {
-    // This class tells the Commands to execute their actions.
+    /// <summary>
+    /// The <c>Invoker</c> class tells the <c>Command</c> class
+    /// to execute their actions.
+    /// </summary>
     public class Invoker
     {
         private Command _command;

@@ -22,7 +22,10 @@
 using System;
 namespace HydraCommand
 {
-    // The Receiver is the object that has an action to be executed from the Command.
+    /// <summary>
+    /// The class <c>Receiver</c> is the object that has an action
+    /// to be executed from the <c>Command</c> class.
+    /// </summary>
     public class Receiver
     {
         public void quit(string[] args) => Environment.Exit(0);
