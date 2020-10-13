@@ -29,6 +29,10 @@ namespace HydraCommand
     public class Receiver
     {
         public void quit(string[] args) => Environment.Exit(0);
-        
+        public void config(string[] args)
+        {
+            Console.WriteLine("Config called");
+        }
+
     }
 }

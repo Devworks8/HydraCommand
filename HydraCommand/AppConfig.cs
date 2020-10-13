@@ -1,5 +1,5 @@
 ﻿//
-//  Configurator.cs
+//  AppConfig.cs
 //
 //  Author:
 //       Christian Lachapelle <lachapellec@gmail.com>
@@ -20,12 +20,22 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Configuration;
+
 namespace HydraCommand
 {
-    public class Configurator
+    public static class AppConfig
     {
-        public Configurator()
+        
+        public static AppSettingsSection GetSettings(string section)
         {
+            Configuration hydraConfig =
+                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            return (AppSettingsSection)hydraConfig.GetSection(section);
         }
     }
 }
+    
+
+    
+    

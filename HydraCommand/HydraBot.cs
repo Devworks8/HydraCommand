@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace HydraCommand
 {
@@ -30,7 +31,7 @@ namespace HydraCommand
 
         // List of valid commands to be created dynamically
         public List<string> commandOptions =
-            new List<string> { "quit" };
+            new List<string> { "quit", "config" };
 
         // Hold the valid command objects in a Dictionary
         public Dictionary<string, Command> validCommands =
@@ -45,8 +46,12 @@ namespace HydraCommand
             return o;
         }
 
-    public void run()
+        
+        public void run()
         {
+            AppSettingsSection botConfig = AppConfig.GetSettings("bot");
+
+
             // Create command objects and assign to dictionary
             foreach (string command in commandOptions)
             {
