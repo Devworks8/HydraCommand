@@ -30,9 +30,9 @@ namespace HydraCommand
     public class Invoker
     {
         private Command _command;
-        private List<string> _args;
+        private string[] _args;
 
-        public void SetCommand(Command command, List<string> args)
+        public void SetCommand(Command command, string[] args)
         {
             this._command = command;
             this._args = args;

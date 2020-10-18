@@ -34,7 +34,7 @@ namespace HydraCommand
             this.Receiver = receiver;
         }
 
-        public abstract void Execute(List<string> args);
+        public abstract void Execute(string[] args);
     }
 
     /// <summary>
@@ -50,13 +50,13 @@ namespace HydraCommand
     public class quit : Command
     {
         public quit(Receiver receiver) : base(receiver) { }
-        public override void Execute(List<string> args) => Receiver.quit(args);
+        public override void Execute(string[] args) => Receiver.quit(args);
     }
 
     public class config : Command
     {
         public config(Receiver receiver) : base(receiver) { }
-        public override void Execute(List<string> args) => Receiver.config(args);
+        public override void Execute(string[] args) => Receiver.config(args);
     }
 
 }

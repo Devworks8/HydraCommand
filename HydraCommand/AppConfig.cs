@@ -170,43 +170,9 @@ namespace HydraCommand
             subCommand["user"] = subSubCommand;
         }
 
-        public static void ParseCommand(List<string> args)
+        public static void ParseCommand(string[] args)
         {
-            /*
-             * Sample command:
-             * user:set:bot:prompt:New Prompt> 
-             * user:get:all
-             * default:get:bot:prompt
-             */
-            string cLevel="", command="";
-            bool error = false;
-
-            while (args.Count > 2)
-            {
-                if (validSubCommands.Contains(args[0]))
-                {
-                    cLevel = args[0];
-                    args.RemoveAt(0);
-                }
-                else if (validSubSubCommands.Contains(args[0]))
-                {
-                    command = args[0];
-                    args.RemoveAt(0);
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("ERROR: Invalid subcommand: {0}", args[0]);
-                    Console.ResetColor();
-                    error = true;
-                    break;
-                }
-            }
-
-            if (!error)
-            {
-                subCommand[cLevel][command].DynamicInvoke(args[0], args[1]);
-            }
+            
         }
 
         private static string Get(string cLevel, string arg)

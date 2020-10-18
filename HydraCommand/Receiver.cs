@@ -29,8 +29,8 @@ namespace HydraCommand
     /// </summary>
     public class Receiver
     {
-        public void quit(List<string> args) => Environment.Exit(0);
-        public void config(List<string> args)
+        public void quit(string[] args) => Environment.Exit(0);
+        public void config(string[] args)
         {
             CommandTree.ParseCommand(args);
         }

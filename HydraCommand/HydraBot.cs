@@ -64,7 +64,7 @@ namespace HydraCommand
             // Now get user input
             string input = Console.ReadLine();
 
-            List<string> command = input.Split(':', StringSplitOptions.RemoveEmptyEntries).ToList();
+            string[] command = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
 
             while (!String.IsNullOrEmpty(input))
             {
@@ -72,7 +72,7 @@ namespace HydraCommand
                 {
                     // Erase the last error message (if there was one)
                     Console.Write(new string(' ', Console.WindowWidth));
-                    invoker.SetCommand(validCommands[command[0].ToLower()], command.GetRange(1, command.Count));
+                    invoker.SetCommand(validCommands[command[0].ToLower()], command);
                     invoker.ExecuteCommand();
                     break;
                 }
@@ -91,7 +91,7 @@ namespace HydraCommand
                     Console.SetCursorPosition(inputCursorLeft, inputCursorTop);
 
                     input = Console.ReadLine();
-                    command = input.Split(':', StringSplitOptions.RemoveEmptyEntries).ToList();
+                    command = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
                 } 
             }
 
