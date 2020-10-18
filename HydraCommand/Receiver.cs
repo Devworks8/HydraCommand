@@ -20,7 +20,10 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
+using ManyConsole;
+
 namespace HydraCommand
 {
     /// <summary>
@@ -29,10 +32,21 @@ namespace HydraCommand
     /// </summary>
     public class Receiver
     {
+        public static IEnumerable<ConsoleCommand> GetCommands()
+        {
+            return ConsoleCommandDispatcher.FindCommandsInSameAssemblyAs(typeof(Receiver));
+        }
+
         public void quit(string[] args) => Environment.Exit(0);
         public void config(string[] args)
         {
-            CommandTree.ParseCommand(args);
+
+            // locate any commands in the assembly (or use an IoC container, or whatever source)
+            var commands = GetCommands();
+
+            // then run them.
+            ConsoleCommandDispatcher.DispatchCommand(commands, args, Console.Out);
+
         }
 
     }

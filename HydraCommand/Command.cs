@@ -42,7 +42,7 @@ namespace HydraCommand
     /// <list type="bullet">
     ///<item>
     ///<description>
-    ///<c>quit</c> => Exit the appliation
+    ///<c>quit</c> => Exit the application
     ///</description>
     ///</item>
     /// </list>

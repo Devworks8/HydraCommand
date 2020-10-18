@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Configuration;
 using System.Collections.Specialized;
+using ManyConsole;
 
 namespace HydraCommand
 {
@@ -30,6 +31,12 @@ namespace HydraCommand
     {
         Receiver r = new Receiver();
         Invoker invoker = new Invoker();
+
+
+        
+
+
+
 
         // List of valid commands to be created dynamically
         public List<string> commandOptions =
@@ -64,15 +71,15 @@ namespace HydraCommand
             // Now get user input
             string input = Console.ReadLine();
 
-            string[] command = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
+            string[] args = input.Split(' ');
 
             while (!String.IsNullOrEmpty(input))
             {
-                if (commandOptions.Contains(command[0]))
+                if (commandOptions.Contains(args[0]))
                 {
                     // Erase the last error message (if there was one)
                     Console.Write(new string(' ', Console.WindowWidth));
-                    invoker.SetCommand(validCommands[command[0].ToLower()], command);
+                    invoker.SetCommand(validCommands[args[0].ToLower()], args);
                     invoker.ExecuteCommand();
                     break;
                 }
@@ -91,7 +98,7 @@ namespace HydraCommand
                     Console.SetCursorPosition(inputCursorLeft, inputCursorTop);
 
                     input = Console.ReadLine();
-                    command = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                    args = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
                 } 
             }
 
