@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
 namespace HydraCommand
 {
     /// <summary>
@@ -28,11 +29,10 @@ namespace HydraCommand
     /// </summary>
     public class Receiver
     {
-        public void quit(string[] args) => Environment.Exit(0);
-        public void config(string[] args)
+        public void quit(List<string> args) => Environment.Exit(0);
+        public void config(List<string> args)
         {
-            
-            Console.WriteLine("Config called");
+            CommandTree.ParseCommand(args);
         }
 
     }

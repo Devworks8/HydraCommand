@@ -136,6 +136,109 @@ namespace HydraCommand
         }
     }
 
+    public static class CommandTree
+    {
+        private static Dictionary<string, Dictionary<string, Delegate>> subCommand =
+            new Dictionary<string, Dictionary<string, Delegate>>();
 
+        private static Dictionary<string, Delegate> subSubCommand =
+            new Dictionary<string, Delegate>();
+
+
+        private static List<string> validSubCommands = new List<string> { "set", "get" };
+        private static List<string> validSubSubCommands = new List<string> { "defaults" };
+
+        //// store
+        //var dico = new Dictionary<int, Delegate>();
+        //dico[1] = new Func<int, int, int>(Func1);
+        //dico[2] = new Func<int, int, int, int>(Func2);
+
+        //// and later invoke
+        //var res = dico[1].DynamicInvoke(1, 2);
+        //Console.WriteLine(res);
+        //var res2 = dico[2].DynamicInvoke(1, 2, 3);
+        //Console.WriteLine(res2);
+
+        static CommandTree()
+        {
+            // Add methods to associated subSubCommand
+            subSubCommand["set"] = new Func<string, string, string>(Set);
+            subSubCommand["get"] = new Func<string, string, string>(Get);
+
+            // Add subSubCommands to associated subCommand
+            subCommand["default"] = subSubCommand;
+            subCommand["user"] = subSubCommand;
+        }
+
+        public static void ParseCommand(List<string> args)
+        {
+            /*
+             * Sample command:
+             * user:set:bot:prompt:New Prompt> 
+             * user:get:all
+             * default:get:bot:prompt
+             */
+            string cLevel="", command="";
+            bool error = false;
+
+            while (args.Count > 2)
+            {
+                if (validSubCommands.Contains(args[0]))
+                {
+                    cLevel = args[0];
+                    args.RemoveAt(0);
+                }
+                else if (validSubSubCommands.Contains(args[0]))
+                {
+                    command = args[0];
+                    args.RemoveAt(0);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("ERROR: Invalid subcommand: {0}", args[0]);
+                    Console.ResetColor();
+                    error = true;
+                    break;
+                }
+            }
+
+            if (!error)
+            {
+                subCommand[cLevel][command].DynamicInvoke(args[0], args[1]);
+            }
+        }
+
+        private static string Get(string cLevel, string arg)
+        {
+            if (cLevel == "default")
+            {
+
+
+
+                DefaultConfig.GetSettings("bot", "prompt");
+                return "";
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        private static string Set(string cLevel, string arg)
+        {
+            if (cLevel == "default")
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ERROR: Unable to set default settings.");
+                Console.ResetColor();
+                return "";
+            }
+            else
+            {
+                return "";
+            }
+        }
+    }
 }   
     

@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Configuration;
 using System.Collections.Specialized;
 
@@ -62,7 +63,8 @@ namespace HydraCommand
 
             // Now get user input
             string input = Console.ReadLine();
-            string[] command = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
+
+            List<string> command = input.Split(':', StringSplitOptions.RemoveEmptyEntries).ToList();
 
             while (!String.IsNullOrEmpty(input))
             {
@@ -70,7 +72,7 @@ namespace HydraCommand
                 {
                     // Erase the last error message (if there was one)
                     Console.Write(new string(' ', Console.WindowWidth));
-                    invoker.SetCommand(validCommands[command[0].ToLower()], command);
+                    invoker.SetCommand(validCommands[command[0].ToLower()], command.GetRange(1, command.Count));
                     invoker.ExecuteCommand();
                     break;
                 }
@@ -89,7 +91,7 @@ namespace HydraCommand
                     Console.SetCursorPosition(inputCursorLeft, inputCursorTop);
 
                     input = Console.ReadLine();
-                    command = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                    command = input.Split(':', StringSplitOptions.RemoveEmptyEntries).ToList();
                 } 
             }
 

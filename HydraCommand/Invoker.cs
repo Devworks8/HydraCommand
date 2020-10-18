@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
 namespace HydraCommand
 {
     /// <summary>
@@ -29,9 +30,9 @@ namespace HydraCommand
     public class Invoker
     {
         private Command _command;
-        private string[] _args;
+        private List<string> _args;
 
-        public void SetCommand(Command command, string[] args)
+        public void SetCommand(Command command, List<string> args)
         {
             this._command = command;
             this._args = args;
