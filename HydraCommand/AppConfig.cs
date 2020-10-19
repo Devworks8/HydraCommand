@@ -170,39 +170,30 @@ namespace HydraCommand
             subCommand["user"] = subSubCommand;
         }
 
-        public static void ParseCommand(string[] args)
-        {
-            
-        }
-
-        private static string Get(string cLevel, string arg)
+        public static string Get(string cLevel, string arg)
         {
             if (cLevel == "default")
             {
-
-
-
-                DefaultConfig.GetSettings("bot", "prompt");
-                return "";
+                return DefaultConfig.GetSettings("bot", "prompt");
             }
             else
             {
-                return "";
+                return null;
             }
         }
 
-        private static string Set(string cLevel, string arg)
+        public static string Set(string cLevel, string arg)
         {
             if (cLevel == "default")
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("ERROR: Unable to set default settings.");
                 Console.ResetColor();
-                return "";
+                return null;
             }
             else
             {
-                return "";
+                return null;
             }
         }
     }

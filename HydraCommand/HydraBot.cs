@@ -32,15 +32,9 @@ namespace HydraCommand
         Receiver r = new Receiver();
         Invoker invoker = new Invoker();
 
-
-        
-
-
-
-
         // List of valid commands to be created dynamically
         public List<string> commandOptions =
-            new List<string> { "quit", "config" };
+            new List<string> { "quit", "config", "help" };
 
         // Hold the valid command objects in a Dictionary
         public Dictionary<string, Command> validCommands =

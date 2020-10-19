@@ -53,6 +53,12 @@ namespace HydraCommand
         public override void Execute(string[] args) => Receiver.quit(args);
     }
 
+    public class help : Command
+    {
+        public help(Receiver receiver) : base(receiver) { }
+        public override void Execute(string[] args) => Receiver.help(args);
+    }
+
     public class config : Command
     {
         public config(Receiver receiver) : base(receiver) { }
