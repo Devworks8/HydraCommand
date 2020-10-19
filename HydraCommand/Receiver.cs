@@ -38,45 +38,41 @@ namespace HydraCommand
             return ConsoleCommandDispatcher.FindCommandsInSameAssemblyAs(typeof(Receiver));
         }
 
-        public void quit(string[] args) => Environment.Exit(0);
+        public void quit(string[] args)
+        {
+            var commands = GetCommands();
+            ConsoleCommandDispatcher.DispatchCommand(commands, args, Console.Out);
+        }
 
         public void help(string[] args)
         {
-
-            // locate any commands in the assembly (or use an IoC container, or whatever source)
             var commands = GetCommands();
 
             if (args.Length > 1)
             {
                 foreach (ConsoleCommand cmd in commands)
                 {
-                    if (cmd.HasAlias(args[1]))
+                    if (!(cmd.Aliases is null) && cmd.Aliases[0] == args[1])
                     {
-                        ManyConsole.Internal.ConsoleHelp.ShowSummaryOfCommands(commands[cmd], Console.Out);
+                        ManyConsole.Internal.ConsoleHelp.ShowCommandHelp(cmd, Console.Out);
+                        break;
                     }
-                    
+                    else
+                    {
+                        ManyConsole.Internal.ConsoleHelp.ShowSummaryOfCommands(commands, Console.Out);
+                        break;
+                    }
                 }
-                //ManyConsole.Internal.ConsoleHelp.ShowSummaryOfCommands(commands., Console.Out);
             }
             else
             {
-                // then run them.
-                //ConsoleCommandDispatcher.DispatchCommand(commands, args, Console.Out);
                 ManyConsole.Internal.ConsoleHelp.ShowSummaryOfCommands(commands, Console.Out);
             }
-            
-
         }
 
         public void config(string[] args)
         {
-
-            // locate any commands in the assembly (or use an IoC container, or whatever source)
             var commands = GetCommands();
-
-            //ConsoleCommandDispatcher.DispatchCommand(commands[args[0]], args, Console.Out);
-
-            // then run them.
             ConsoleCommandDispatcher.DispatchCommand(commands, args, Console.Out);
             
 

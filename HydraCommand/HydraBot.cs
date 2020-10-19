@@ -40,6 +40,8 @@ namespace HydraCommand
         public Dictionary<string, Command> validCommands =
             new Dictionary<string, Command>();
 
+        public string prompt;
+
         // Dynamically create a Command object className with the Receiver object argument
         public Command CreateInstance(string className, Receiver r)
         {
@@ -103,7 +105,7 @@ namespace HydraCommand
 
         public void run()
         {
-            string prompt = DefaultConfig.GetSettings("bot", "prompt");
+            //string prompt = DefaultConfig.GetSettings("bot", "prompt");
             
 
             // Create command objects and assign to dictionary
@@ -111,13 +113,15 @@ namespace HydraCommand
             {
                 validCommands.Add(command, CreateInstance(command, r));
             }
-
-            prompt = CustomConfig.SingleInstance.LoadConfig(DefaultConfig.GetSettings("cfg", "path"));
+            
+            CustomConfig customConfig = new CustomConfig(DefaultConfig.GetSettings("cfg", "path"));
+            //TODO: Reference customConfig dictionary
+            prompt = customConfig.LoadConfig(DefaultConfig.GetSettings("cfg", "path"));
             
 
             while (true)
             {
-                GetUserInput(prompt);
+                GetUserInput(customConfig.LoadConfig(DefaultConfig.GetSettings("cfg", "path")));
             }
         }
     }

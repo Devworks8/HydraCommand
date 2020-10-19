@@ -34,13 +34,23 @@ namespace HydraCommand
 
         public override int Run(string[] remainingArguments)
         {
-            // locate any commands in the assembly (or use an IoC container, or whatever source)
-            //var commands = GetCommands();
-            //ManyConsole.Internal.ConsoleHelp.ShowSummaryOfCommands(commands, );
             return 0;
         }
     }
 
+    public class QuitCommand : ConsoleCommand
+    {
+        public QuitCommand()
+        {
+            IsCommand("quit", "Quit the program.");
+        }
+
+        public override int Run(string[] remainingArguments)
+        {
+            Environment.Exit(0);
+            return 0;
+        }
+    }
 
 
     public class ConfigCommand : ConsoleCommand
@@ -86,26 +96,48 @@ Config Level: The config you wish to access. [default|user]
                 {
                     if (String.IsNullOrEmpty(Service))
                     {
-
+                        Console.WriteLine("Showing results for -> default:all\n\n{0}", DefaultConfig.GetSettings("all"));
                     }
                     else
                     {
                         if (String.IsNullOrEmpty(Field))
                         {
-                            
+                            Console.WriteLine("Showing results for -> defaults:{0}\n\n{1}", Service, DefaultConfig.GetSettings(Service));
                         }
                         else
                         {
-                            Console.WriteLine("Results:\n");
-                            Console.WriteLine(DefaultConfig.GetSettings(Service, Field));
+                            Console.WriteLine("Showing results for -> default:prompt= {0}", DefaultConfig.GetSettings(Service, Field));
                         }
-                    }
-                    
+                    }   
+                }
+                else if (Operation.ToLower() == "set")
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("ERROR: Unable to set values in the default config.");
+                    Console.ResetColor();
                 }
             }
-            else
+            //TODO: Need to finish this
+            else if (CLevel.ToLower() == "user")
             {
-
+                if (Operation.ToLower() == "get")
+                {
+                    if (String.IsNullOrEmpty(Service))
+                    {
+                        Console.WriteLine("default:all\n\n{0}", DefaultConfig.GetSettings("all"));
+                    }
+                    else
+                    {
+                        if (String.IsNullOrEmpty(Field))
+                        {
+                            Console.WriteLine("defaults:{0}\n\n{1}", Service, DefaultConfig.GetSettings(Service));
+                        }
+                        else
+                        {
+                            Console.WriteLine("default:prompt= {0}", DefaultConfig.GetSettings(Service, Field));
+                        }
+                    }
+                }
             }
             return 0;
         }

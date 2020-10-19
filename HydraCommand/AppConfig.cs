@@ -24,6 +24,8 @@ using System.IO;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Reflection;
+
 
 //using YamlDotNet.Serialization;
 //using YamlDotNet.RepresentationModel;
@@ -38,33 +40,6 @@ namespace HydraCommand
 
     public sealed class DefaultConfig : Sections
     {
-        private static DefaultConfig _instance = null;
-        private static readonly object _lock = new object();
-
-        DefaultConfig() { }
-
-        public static DefaultConfig SingleInstance
-        {
-            get
-            {
-                /*
-                 * The lock will allow only one thread at a time to access 
-                 * the block of code inside it.
-                 * If there is already a thread accessing the block of code
-                 * inside the lock, the other threads will hold at this point
-                 * until the first thread finishes her business inside that block.
-                 */
-                lock (_lock)
-                {
-                    if (_instance == null)
-                    {
-                        _instance = new DefaultConfig();
-                    }
-                    return _instance;
-                }
-            }
-        }
-
         // Hold Default Config Settings
         public static Dictionary<string, NameValueCollection> configDefaults =
             new Dictionary<string, NameValueCollection>();
@@ -82,120 +57,110 @@ namespace HydraCommand
             return (NameValueCollection)ConfigurationManager.GetSection(section);
         }
 
+        public static dynamic GetSettings(string section)
+        {
+            string results = "";
+            if (section.ToLower() == "all")
+            {
+                foreach(KeyValuePair<string, NameValueCollection> kvps in configDefaults)
+                {
+                    // Add the section headers
+                    results += "["+kvps.Key+"]" + "\n";
+                    foreach(string kvp in kvps.Value)
+                    {
+                        // Add the key=value
+                        results += kvp + "= " + configDefaults[kvps.Key][kvp];
+                    }
+                    results += "\n\n";
+                }
+                return results;
+            }
+            else if (defaultSections.Contains(section.ToLower()))
+            {
+                foreach(string kvp in configDefaults[section])
+                {
+                    results += kvp + "= " + configDefaults[section][kvp];
+                }
+                return results;
+            }
+            return string.Format("Unrecognized argument: {0}", section);
+        }
+
         public static dynamic GetSettings(string section, string key)
         {
             return configDefaults[section][key];
         }
     }
 
-    public sealed class CustomConfig : Sections
+    public class CustomConfig : Sections
     {
-        private static CustomConfig _instance = null;
-        private static readonly object _lock = new object();
-        
-        CustomConfig() { }
+        private IniFile iniFile;
 
-        public static CustomConfig SingleInstance
+        public CustomConfig(string filename)
         {
-            get
-            {
-                /*
-                 * The lock will allow only one thread at a time to access 
-                 * the block of code inside it.
-                 * If there is already a thread accessing the block of code
-                 * inside the lock, the other threads will hold at this point
-                 * until the first thread finishes her business inside that block.
-                 */
-                lock (_lock)
-                {
-                    if (_instance == null)
-                    {
-                        _instance = new CustomConfig();
-                    }
-                    return _instance;
-                }
-            }
+            iniFile = new IniFile(filename);
         }
 
         public static Dictionary<string, string> customConfig = new Dictionary<string, string>();
 
+        //TODO: Must populate customConfig dictionary
+        public static void ParseCustom()
+        {
+            foreach (string section in defaultSections)
+            {
+                customConfig.Add(section, _GetSettings(section));
+            }
+        }
+
+        private static string _GetSettings(string section)
+        {
+            //TODO: iterate thru custom config ini
+            return "";
+        }
+        //TODO: This will be unecessary once ParseCustome is done
         public string LoadConfig(string filename)
         {
-            string fullPath = @"/Users/souljourner/Dropbox/Coding/C#/HydraCommand/HydraCommand/" + filename;
-            var iniFile = new IniFile(fullPath);
             string[] all = iniFile.GetAllValues("bot", "prompt");
-            Console.WriteLine(all);
+
+            foreach (string val in all)
+            {
+                Console.WriteLine(val);
+            }
+
             if (iniFile.GetValue("bot", "prompt") != "default")
             {
-                string prompt;
-                return prompt = iniFile.GetValue("bot", "prompt");
+                return iniFile.GetValue("bot", "prompt");
             }
 
             return DefaultConfig.GetSettings("bot", "prompt");
-
         }
-    }
-
-    public static class CommandTree
-    {
-        private static Dictionary<string, Dictionary<string, Delegate>> subCommand =
-            new Dictionary<string, Dictionary<string, Delegate>>();
-
-        private static Dictionary<string, Delegate> subSubCommand =
-            new Dictionary<string, Delegate>();
-
-
-        private static List<string> validSubCommands = new List<string> { "set", "get" };
-        private static List<string> validSubSubCommands = new List<string> { "defaults" };
-
-        //// store
-        //var dico = new Dictionary<int, Delegate>();
-        //dico[1] = new Func<int, int, int>(Func1);
-        //dico[2] = new Func<int, int, int, int>(Func2);
-
-        //// and later invoke
-        //var res = dico[1].DynamicInvoke(1, 2);
-        //Console.WriteLine(res);
-        //var res2 = dico[2].DynamicInvoke(1, 2, 3);
-        //Console.WriteLine(res2);
-
-        static CommandTree()
-        {
-            // Add methods to associated subSubCommand
-            subSubCommand["set"] = new Func<string, string, string>(Set);
-            subSubCommand["get"] = new Func<string, string, string>(Get);
-
-            // Add subSubCommands to associated subCommand
-            subCommand["default"] = subSubCommand;
-            subCommand["user"] = subSubCommand;
-        }
-
-        public static string Get(string cLevel, string arg)
-        {
-            if (cLevel == "default")
-            {
-                return DefaultConfig.GetSettings("bot", "prompt");
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public static string Set(string cLevel, string arg)
-        {
-            if (cLevel == "default")
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("ERROR: Unable to set default settings.");
-                Console.ResetColor();
-                return null;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        //TODO: Complete this
+        //public static dynamic GetSettings(string section)
+        //{
+        //    string results = "";
+        //    if (section.ToLower() == "all")
+        //    {
+        //        foreach (KeyValuePair<string, string> kvps in )
+        //        {
+        //            results += "[" + kvps.Key + "]" + "\n";
+        //            foreach (string kvp in kvps.Value)
+        //            {
+        //                results += kvp + "= " + configDefaults[kvps.Key][kvp];
+        //            }
+        //            Console.Write("\n\n");
+        //        }
+        //        return results;
+        //    }
+        //    else if (defaultSections.Contains(section.ToLower()))
+        //    {
+        //        foreach (string kvp in configDefaults[section])
+        //        {
+        //            results += kvp + "= " + configDefaults[section][kvp];
+        //        }
+        //        return results;
+        //    }
+        //    return string.Format("Unrecognized argument: {0}", section);
+        //}
     }
 }   
     
