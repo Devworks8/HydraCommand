@@ -28,8 +28,7 @@ namespace Hydra
     {
         public static void Main(string[] args)
         {
-            HydraBot bot = new HydraBot();
-            bot.run();
+            HydraBot.run();
         }
     }
 }

@@ -20,30 +20,25 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Configuration;
-using System.Collections.Specialized;
-using ManyConsole;
 
 namespace HydraCommand
 {
-    public class HydraBot
+    public static class HydraBot
     {
-        Receiver r = new Receiver();
-        Invoker invoker = new Invoker();
+        static Receiver r = new Receiver();
+        static Invoker invoker = new Invoker();
+
 
         // List of valid commands to be created dynamically
-        public List<string> commandOptions =
+        public static List<string> commandOptions =
             new List<string> { "quit", "config", "help" };
 
         // Hold the valid command objects in a Dictionary
-        public Dictionary<string, Command> validCommands =
+        public static Dictionary<string, Command> validCommands =
             new Dictionary<string, Command>();
 
-        public string prompt;
-
         // Dynamically create a Command object className with the Receiver object argument
-        public Command CreateInstance(string className, Receiver r)
+        public static Command CreateInstance(string className, Receiver r)
         {
             Type t = Type.GetType("HydraCommand." + className);
 
@@ -51,12 +46,7 @@ namespace HydraCommand
             return o;
         }
 
-        public HydraBot()
-        {
-            DefaultConfig.ParseDefaults();
-        }
-
-        private void GetUserInput(string prompt)
+        private static void GetUserInput(string prompt)
         {
             Console.Write(prompt);
 
@@ -103,10 +93,11 @@ namespace HydraCommand
 
         }
 
-        public void run()
+        public static void run()
         {
-            //string prompt = DefaultConfig.GetSettings("bot", "prompt");
-            
+            DefaultConfig.ParseDefaults();
+            CustomConfig.LoadConfig(DefaultConfig.GetSettings("cfg", "path"));
+            CustomConfig.ParseCustom();
 
             // Create command objects and assign to dictionary
             foreach (string command in commandOptions)
@@ -114,14 +105,9 @@ namespace HydraCommand
                 validCommands.Add(command, CreateInstance(command, r));
             }
             
-            CustomConfig customConfig = new CustomConfig(DefaultConfig.GetSettings("cfg", "path"));
-            //TODO: Reference customConfig dictionary
-            prompt = customConfig.LoadConfig(DefaultConfig.GetSettings("cfg", "path"));
-            
-
             while (true)
             {
-                GetUserInput(customConfig.LoadConfig(DefaultConfig.GetSettings("cfg", "path")));
+                GetUserInput(CustomConfig.GetSettings("bot", "prompt"));
             }
         }
     }

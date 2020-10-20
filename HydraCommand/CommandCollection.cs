@@ -106,7 +106,7 @@ Config Level: The config you wish to access. [default|user]
                         }
                         else
                         {
-                            Console.WriteLine("Showing results for -> default:prompt= {0}", DefaultConfig.GetSettings(Service, Field));
+                            Console.WriteLine("Showing results for -> default:{0}= {1}", Field, DefaultConfig.GetSettings(Service, Field));
                         }
                     }   
                 }
@@ -117,24 +117,24 @@ Config Level: The config you wish to access. [default|user]
                     Console.ResetColor();
                 }
             }
-            //TODO: Need to finish this
+            //TODO: Need to process Set operation.
             else if (CLevel.ToLower() == "user")
             {
                 if (Operation.ToLower() == "get")
                 {
                     if (String.IsNullOrEmpty(Service))
                     {
-                        Console.WriteLine("default:all\n\n{0}", DefaultConfig.GetSettings("all"));
+                        Console.WriteLine("Showing results for -> user:all\n\n{0}",  CustomConfig.GetSettings("all"));
                     }
                     else
                     {
                         if (String.IsNullOrEmpty(Field))
                         {
-                            Console.WriteLine("defaults:{0}\n\n{1}", Service, DefaultConfig.GetSettings(Service));
+                            Console.WriteLine("Showing results for -> user:{0}\n\n{1}", Service, CustomConfig.GetSettings(Service));
                         }
                         else
                         {
-                            Console.WriteLine("default:prompt= {0}", DefaultConfig.GetSettings(Service, Field));
+                            Console.WriteLine("Showing results for -> user:{0}= {1}", Field, CustomConfig.GetSettings(Service, Field));
                         }
                     }
                 }

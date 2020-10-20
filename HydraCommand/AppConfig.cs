@@ -20,25 +20,19 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.IO;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Reflection;
-
-
-//using YamlDotNet.Serialization;
-//using YamlDotNet.RepresentationModel;
 
 namespace HydraCommand
 {
-    public class Sections
+    public static class Sections
     {
         public static List<string> defaultSections =
             new List<string> { "bot", "cfg" };
     }
 
-    public sealed class DefaultConfig : Sections
+    public static class DefaultConfig
     {
         // Hold Default Config Settings
         public static Dictionary<string, NameValueCollection> configDefaults =
@@ -46,7 +40,7 @@ namespace HydraCommand
 
         public static void ParseDefaults()
         {
-            foreach (string section in defaultSections)
+            foreach (string section in Sections.defaultSections)
             {
                 configDefaults.Add(section, _GetSettings(section));
             }
@@ -69,17 +63,17 @@ namespace HydraCommand
                     foreach(string kvp in kvps.Value)
                     {
                         // Add the key=value
-                        results += kvp + "= " + configDefaults[kvps.Key][kvp];
+                        results += kvp + "= " + configDefaults[kvps.Key][kvp]+"\n";
                     }
-                    results += "\n\n";
+                    results += "\n";
                 }
                 return results;
             }
-            else if (defaultSections.Contains(section.ToLower()))
+            else if (Sections.defaultSections.Contains(section.ToLower()))
             {
                 foreach(string kvp in configDefaults[section])
                 {
-                    results += kvp + "= " + configDefaults[section][kvp];
+                    results += kvp + "= " + configDefaults[section][kvp]+"\n";
                 }
                 return results;
             }
@@ -92,75 +86,71 @@ namespace HydraCommand
         }
     }
 
-    public class CustomConfig : Sections
+    public static class CustomConfig
     {
-        private IniFile iniFile;
+        private static IniFile iniFile;
 
-        public CustomConfig(string filename)
+        public static Dictionary<string, Dictionary<string, string>> customConfig = new Dictionary<string, Dictionary<string, string>>();
+
+        public static void LoadConfig(string filename)
         {
             iniFile = new IniFile(filename);
         }
 
-        public static Dictionary<string, string> customConfig = new Dictionary<string, string>();
-
-        //TODO: Must populate customConfig dictionary
         public static void ParseCustom()
         {
-            foreach (string section in defaultSections)
+            foreach (string section in Sections.defaultSections)
             {
                 customConfig.Add(section, _GetSettings(section));
             }
         }
 
-        private static string _GetSettings(string section)
+        private static Dictionary<string, string> _GetSettings(string section)
         {
-            //TODO: iterate thru custom config ini
-            return "";
+            return iniFile.GetValue(section);
         }
-        //TODO: This will be unecessary once ParseCustome is done
-        public string LoadConfig(string filename)
-        {
-            string[] all = iniFile.GetAllValues("bot", "prompt");
 
-            foreach (string val in all)
+        public static string GetSettings(string section, string key)
+        {
+            if (section.ToLower() == "bot" && key.ToLower() == "prompt")
             {
-                Console.WriteLine(val);
+                if (iniFile.GetValue("bot", "prompt") != "default")
+                {
+                    return iniFile.GetValue("bot", "prompt");
+                }
+
+                return DefaultConfig.GetSettings("bot", "prompt");
             }
 
-            if (iniFile.GetValue("bot", "prompt") != "default")
-            {
-                return iniFile.GetValue("bot", "prompt");
-            }
-
-            return DefaultConfig.GetSettings("bot", "prompt");
+            return customConfig[section][key];
         }
-        //TODO: Complete this
-        //public static dynamic GetSettings(string section)
-        //{
-        //    string results = "";
-        //    if (section.ToLower() == "all")
-        //    {
-        //        foreach (KeyValuePair<string, string> kvps in )
-        //        {
-        //            results += "[" + kvps.Key + "]" + "\n";
-        //            foreach (string kvp in kvps.Value)
-        //            {
-        //                results += kvp + "= " + configDefaults[kvps.Key][kvp];
-        //            }
-        //            Console.Write("\n\n");
-        //        }
-        //        return results;
-        //    }
-        //    else if (defaultSections.Contains(section.ToLower()))
-        //    {
-        //        foreach (string kvp in configDefaults[section])
-        //        {
-        //            results += kvp + "= " + configDefaults[section][kvp];
-        //        }
-        //        return results;
-        //    }
-        //    return string.Format("Unrecognized argument: {0}", section);
-        //}
+
+        public static string GetSettings(string section)
+        {
+            string results = "";
+            if (section.ToLower() == "all")
+            {
+                foreach (KeyValuePair<string, Dictionary<string, string>> _section in customConfig)
+                {
+                    results += "[" + _section.Key + "]" + "\n";
+                    foreach (string _field in customConfig[_section.Key].Keys)
+                    {
+                        results += _field + "= " + customConfig[_section.Key][_field]+"\n";
+                    }
+                    results += "\n";
+                }
+                return results;
+            }
+            else if (Sections.defaultSections.Contains(section.ToLower()))
+            {
+                foreach (KeyValuePair<string, string> kvp in customConfig[section])
+                {
+                    results += kvp.Key + "= " + kvp.Value+"\n";
+                }
+                return results;
+            }
+            return string.Format("Unrecognized argument: {0}", section);
+        }
     }
 }   
     

@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 
 namespace HydraCommand
@@ -148,6 +149,25 @@ namespace HydraCommand
                 key2 = String.Format("[{0}]{1}", section, key);
 
             return dictionary.TryGetValue(key2.ToLower(), out value);
+        }
+
+        /// <summary>
+        /// Get a keys and values of a section.
+        /// </summary>
+        /// <param name="section">The section.</param>
+        /// <returns>The dictionary of keys and values by section</returns>
+        public Dictionary<string, string> GetValue(string section)
+        {
+            Dictionary<string, string> value = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, string> kvp in dictionary)
+            {
+                string _section = "[" + section + "]";
+                if (kvp.Key.Contains(_section))
+                {
+                    value.Add(kvp.Key.Substring(_section.Length), kvp.Value);
+                }
+            }
+            return value;
         }
 
         /// <summary>
