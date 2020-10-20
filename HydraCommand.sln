@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HydraCommand", "HydraCommand\HydraCommand.csproj", "{A22BF607-5A71-43A8-AC20-9918EF7AB7C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4D164E20-1EE2-4FF1-B8D0-F9086586BBA3}"
-	ProjectSection(SolutionItems) = preProject
-		HydraCommand\bin\Debug\netcoreapp3.1\config.ini = HydraCommand\bin\Debug\netcoreapp3.1\config.ini
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
