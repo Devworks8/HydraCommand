@@ -23,6 +23,8 @@ using System;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using IniParser;
+using IniParser.Model;
 
 namespace HydraCommand
 {
@@ -30,6 +32,9 @@ namespace HydraCommand
     {
         public static List<string> defaultSections =
             new List<string> { "bot", "cfg" };
+
+        public static List<string> customSections =
+            new List<string> { "bot" };
     }
 
     public static class DefaultConfig
@@ -88,41 +93,32 @@ namespace HydraCommand
 
     public static class CustomConfig
     {
-        private static IniFile iniFile;
+        private static IniData iniData;
+        private static FileIniDataParser iniParser;
+        private static string iniFilename;
 
         public static Dictionary<string, Dictionary<string, string>> customConfig = new Dictionary<string, Dictionary<string, string>>();
 
         public static void LoadConfig(string filename)
         {
-            iniFile = new IniFile(filename);
-        }
-
-        public static void ParseCustom()
-        {
-            foreach (string section in Sections.defaultSections)
-            {
-                customConfig.Add(section, _GetSettings(section));
-            }
-        }
-
-        private static Dictionary<string, string> _GetSettings(string section)
-        {
-            return iniFile.GetValue(section);
+            iniFilename = filename;
+            iniParser = new FileIniDataParser();
+            iniData = iniParser.ReadFile(filename);
         }
 
         public static string GetSettings(string section, string key)
         {
             if (section.ToLower() == "bot" && key.ToLower() == "prompt")
             {
-                if (iniFile.GetValue("bot", "prompt") != "default")
+                if (iniData["bot"]["prompt"] != "default")
                 {
-                    return iniFile.GetValue("bot", "prompt");
+                    return iniData["bot"]["prompt"];
                 }
 
                 return DefaultConfig.GetSettings("bot", "prompt");
             }
 
-            return customConfig[section][key];
+            return iniData[section][key];
         }
 
         public static string GetSettings(string section)
@@ -130,26 +126,41 @@ namespace HydraCommand
             string results = "";
             if (section.ToLower() == "all")
             {
-                foreach (KeyValuePair<string, Dictionary<string, string>> _section in customConfig)
+                foreach (SectionData _section in iniData.Sections)
                 {
-                    results += "[" + _section.Key + "]" + "\n";
-                    foreach (string _field in customConfig[_section.Key].Keys)
+                    results += "[" + _section.SectionName + "]" + "\n";
+
+                    foreach (KeyData _field in _section.Keys)
                     {
-                        results += _field + "= " + customConfig[_section.Key][_field]+"\n";
+                        results += _field.KeyName + "= " + _field.Value + "\n";
                     }
                     results += "\n";
                 }
                 return results;
             }
-            else if (Sections.defaultSections.Contains(section.ToLower()))
+            else if (iniData.Sections.ContainsSection(section.ToLower()))
             {
-                foreach (KeyValuePair<string, string> kvp in customConfig[section])
+                foreach (KeyData _field in iniData[section])
                 {
-                    results += kvp.Key + "= " + kvp.Value+"\n";
+                    results += _field.KeyName + "= " + _field.Value + "\n";
                 }
                 return results;
             }
             return string.Format("Unrecognized argument: {0}", section);
+        }
+
+        public static bool SetSetting(string section, string key, string value)
+        {
+            try
+            {
+                iniData[section][key] = value;
+                iniParser.WriteFile(iniFilename, iniData);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }  
         }
     }
 }   

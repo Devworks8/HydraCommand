@@ -14,11 +14,12 @@
   <ItemGroup>
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     <PackageReference Include="ManyConsole" Version="2.0.1" />
+    <PackageReference Include="ini-parser" Version="2.5.2" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="config.ini" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="config.ini" />
+    <Compile Remove="IniFile.cs" />
   </ItemGroup>
 </Project>

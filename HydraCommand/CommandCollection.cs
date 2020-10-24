@@ -19,8 +19,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using ManyConsole;
 
 namespace HydraCommand
@@ -78,6 +76,7 @@ Config Level: The config you wish to access. [default|user]
             HasOption("s|service=", "The service name.", s => Service = s);
             HasOption("f|field=", "The field name.", f => Field = f);
             HasAdditionalArguments(2, "<Config Level> <Operation>");
+            AllowsAnyAdditionalArguments("<arg>");
         }
 
         public override int? OverrideAfterHandlingArgumentsBeforeRun(string[] remainingArguments)
@@ -112,9 +111,7 @@ Config Level: The config you wish to access. [default|user]
                 }
                 else if (Operation.ToLower() == "set")
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("ERROR: Unable to set values in the default config.");
-                    Console.ResetColor();
+                    Helper.DisplayError("Unable to set values in the default config");
                 }
             }
             //TODO: Need to process Set operation.
@@ -135,6 +132,28 @@ Config Level: The config you wish to access. [default|user]
                         else
                         {
                             Console.WriteLine("Showing results for -> user:{0}= {1}", Field, CustomConfig.GetSettings(Service, Field));
+                        }
+                    }
+                }
+                else if (Operation.ToLower() == "set")
+                {
+                    if (string.IsNullOrEmpty(Service))
+                    {
+                        Helper.DisplayError("Service name required.");
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(Field))
+                        {
+                            Helper.DisplayError("Field Name required.");
+                        }
+                        else
+                        {
+                            if (!CustomConfig.SetSetting(Service, Field, remainingArguments[2]))
+                            {
+                                Helper.DisplayError("Failed to make changes.");
+                            }
+                            Console.WriteLine("{0}:{1} has been updated.", Service, Field);
                         }
                     }
                 }

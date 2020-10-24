@@ -97,7 +97,7 @@ namespace HydraCommand
         {
             DefaultConfig.ParseDefaults();
             CustomConfig.LoadConfig(DefaultConfig.GetSettings("cfg", "path"));
-            CustomConfig.ParseCustom();
+            //CustomConfig.ParseCustom();
 
             // Create command objects and assign to dictionary
             foreach (string command in commandOptions)
