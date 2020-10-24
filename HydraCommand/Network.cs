@@ -20,12 +20,39 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-namespace HydraCommand
+using NetMQ;
+
+namespace HydraNetwork
 {
-    public class Network
+    /// <summary>
+    /// Receives requests from users and sends to Reactor
+    /// </summary>
+    public class Proxy
     {
-        public Network()
-        {
-        }
+        
+    }
+
+    /// <summary>
+    /// Receives requests from Reactor and sends to Nodes
+    /// </summary>
+    public class Messenger
+    {
+
+    }
+
+    /// <summary>
+    /// Receives requests from proxy and sends to Messenger
+    /// </summary>
+    public class Reactor
+    {
+
+    }
+
+    /// <summary>
+    /// Service Node
+    /// </summary>
+    public class Node
+    {
+
     }
 }
