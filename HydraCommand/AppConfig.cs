@@ -97,8 +97,6 @@ namespace HydraCommand
         private static FileIniDataParser iniParser;
         private static string iniFilename;
 
-        public static Dictionary<string, Dictionary<string, string>> customConfig = new Dictionary<string, Dictionary<string, string>>();
-
         public static void LoadConfig(string filename)
         {
             iniFilename = filename;

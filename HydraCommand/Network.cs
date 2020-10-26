@@ -20,14 +20,17 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using NetMQ;
+using NetMQ.Sockets;
 
 namespace HydraNetwork
 {
     /// <summary>
     /// Receives requests from users and sends to Reactor
     /// </summary>
-    public class Proxy
+    public class Client
     {
         
     }
@@ -45,13 +48,14 @@ namespace HydraNetwork
     /// </summary>
     public class Reactor
     {
-
+        //static async Task<DealerSocket>
+            
     }
 
     /// <summary>
-    /// Service Node
+    /// Service Worker
     /// </summary>
-    public class Node
+    public class Service
     {
 
     }
