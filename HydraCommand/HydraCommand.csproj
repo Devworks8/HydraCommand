@@ -15,7 +15,7 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
     <PackageReference Include="ManyConsole" Version="2.0.1" />
     <PackageReference Include="ini-parser" Version="2.5.2" />
-    <PackageReference Include="NetMQ" Version="4.0.1.6" />
+    <PackageReference Include="ZeroMQ" Version="4.1.0.31" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="config.ini" />
