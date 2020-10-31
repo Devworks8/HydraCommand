@@ -77,5 +77,11 @@ namespace HydraCommand
 
         }
 
+        public void network(string[] args)
+        {
+            var commands = GetCommands();
+            ConsoleCommandDispatcher.DispatchCommand(commands, args, Console.Out);
+        }
+
     }
 }

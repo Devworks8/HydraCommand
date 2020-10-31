@@ -34,7 +34,7 @@ namespace HydraCommand
             new List<string> { "bot", "cfg" };
 
         public static List<string> customSections =
-            new List<string> { "bot" };
+            new List<string> { "bot", "proxy", "reactor", "messenger" };
     }
 
     public static class DefaultConfig
@@ -106,6 +106,15 @@ namespace HydraCommand
 
         public static string GetSettings(string section, string key)
         {
+            if (iniData[section][key] == "default")
+            {
+                return DefaultConfig.GetSettings(section, key);
+            }
+            else
+            {
+                return iniData[section][key];
+            }
+            /*
             if (section.ToLower() == "bot" && key.ToLower() == "prompt")
             {
                 if (iniData["bot"]["prompt"] != "default")
@@ -117,6 +126,7 @@ namespace HydraCommand
             }
 
             return iniData[section][key];
+            */
         }
 
         public static string GetSettings(string section)

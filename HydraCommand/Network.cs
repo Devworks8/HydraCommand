@@ -26,36 +26,26 @@ using HydraCommand;
 namespace HydraNetwork
 {
     /// <summary>
-    /// Network classes interface
-    /// </summary>
-    public interface State
-    {
-        abstract void Status();
-        abstract void Start();
-        abstract void Stop();
-        abstract void Restart();
-    }
-
-
-    /// <summary>
     /// Receives requests from users and sends to Reactor
     /// </summary>
-    public class Proxy : State
+    public static class Proxy
     {
-        private bool isRunning { get; set; } = false;
-        private bool isRestarting { get; set; } = false;
-        private static ZContext backend_ctx { get; set; }
-        private static ZContext frontend_ctx { get; set; }
-        private ZSocket backend { get; set; }
-        private ZSocket frontend { get; set; }
+        private static bool isRunning { get; set; } = false;
+        private static bool isRestarting { get; set; } = false;
+        private static ZContext backend_ctx;
+        private static ZContext frontend_ctx;
+        private static ZSocket backend;
+        private static ZSocket frontend;
 
-        public void Status()
+        static Proxy() { }
+
+        public static void Status()
         {
             if (isRunning) Console.WriteLine("The proxy is: Running");
             else Console.WriteLine("The proxy is: Stopped");
         }
 
-        public void Start()
+        public static void Start()
         {
             if (!isRunning)
             {
@@ -73,7 +63,7 @@ namespace HydraNetwork
             else Helper.DisplayError("Proxy is already running...");
         }
 
-        public void Stop()
+        public static void Stop()
         {
             if (isRunning)
             {
@@ -87,7 +77,7 @@ namespace HydraNetwork
             else Helper.DisplayError("Proxy is not running...");
         }
 
-        public void Restart()
+        public static void Restart()
         {
             if (isRunning)
             {
@@ -105,28 +95,64 @@ namespace HydraNetwork
     /// <summary>
     /// Receives requests from Reactor and sends to Nodes
     /// </summary>
-    public class Messenger
+    public static class Messenger
     {
-        private bool isRunning { get; set; } = false;
+        private static bool isRunning { get; set; } = false;
+        private static bool isRestarting { get; set; } = false;
+        private static ZContext reactor_ctx { get; set; }
+        private static ZContext node_ctx { get; set; }
+        private static ZSocket reactor { get; set; }
+        private static ZSocket node { get; set; }
 
-        public void Status()
+        public static void Status()
         {
-
+            if (isRunning) Console.WriteLine("The messenger is: Running");
+            else Console.WriteLine("The messenger is: Stopped");
         }
 
-        public void Start()
+        public static void Start()
         {
-
+            if (!isRunning)
+            {
+                reactor_ctx = new ZContext();
+                node_ctx = new ZContext();
+                node = new ZSocket(node_ctx, ZSocketType.ROUTER);
+                reactor = new ZSocket(reactor_ctx, ZSocketType.DEALER);
+                // Bind both sockets to TCP ports
+                node.Bind("tcp://" + CustomConfig.GetSettings("messenger", "node")
+                    + ":" + CustomConfig.GetSettings("messenger", "node_port"));
+                reactor.Bind("tcp://" + CustomConfig.GetSettings("messenger", "reactor")
+                    + ":" + CustomConfig.GetSettings("messenger", "reactor_port"));
+                if (!isRestarting) Console.WriteLine("Messenger started");
+            }
+            else Helper.DisplayError("Messenger is already running...");
         }
 
-        public void Stop()
+        public static void Stop()
         {
-
+            if (isRunning)
+            {
+                node.Close();
+                node_ctx.Terminate();
+                reactor.Close();
+                reactor_ctx.Terminate();
+                if (!isRestarting) Console.WriteLine("Messenger has been terminated");
+                isRunning = false;
+            }
+            else Helper.DisplayError("Messenger is not running...");
         }
 
-        public void Restart()
+        public static void Restart()
         {
-
+            if (isRunning)
+            {
+                isRestarting = true;
+                Stop();
+                Start();
+                Console.WriteLine("Messenger restarted");
+                isRestarting = false;
+            }
+            else Helper.DisplayError("Messenger is not running...");
         }
 
     }
@@ -134,58 +160,134 @@ namespace HydraNetwork
     /// <summary>
     /// Receives requests from proxy and sends to Messenger
     /// </summary>
-    public class Reactor
+    public static class Reactor
     {
-        private bool isRunning { get; set; } = false;
+        private static bool isRunning { get; set; } = false;
+        private static bool isRestarting { get; set; } = false;
+        private static ZContext proxy_ctx { get; set; }
+        private static ZContext messenger_ctx { get; set; }
+        private static ZSocket proxy { get; set; }
+        private static ZSocket messenger { get; set; }
 
-        public void Status()
+        public static void Status()
         {
-
+            if (isRunning) Console.WriteLine("The reactor is: Running");
+            else Console.WriteLine("The reactor is: Stopped");
         }
 
-        public void Start()
+        public static void Start()
         {
-
+            if (!isRunning)
+            {
+                proxy_ctx = new ZContext();
+                messenger_ctx = new ZContext();
+                proxy = new ZSocket(proxy_ctx, ZSocketType.DEALER);
+                messenger = new ZSocket(messenger_ctx, ZSocketType.ROUTER);
+                // Bind both sockets to TCP ports
+                proxy.Bind("tcp://" + CustomConfig.GetSettings("reactor", "proxy")
+                    + ":" + CustomConfig.GetSettings("reactor", "proxy_port"));
+                messenger.Bind("tcp://" + CustomConfig.GetSettings("reactor", "messenger")
+                    + ":" + CustomConfig.GetSettings("reactor", "messenger_port"));
+                if (!isRestarting) Console.WriteLine("Reactor started");
+            }
+            else Helper.DisplayError("Reactor is already running...");
         }
 
-        public void Stop()
+        public static void Stop()
         {
-
+            if (isRunning)
+            {
+                proxy.Close();
+                proxy_ctx.Terminate();
+                messenger.Close();
+                messenger_ctx.Terminate();
+                if (!isRestarting) Console.WriteLine("Reactor has been terminated");
+                isRunning = false;
+            }
+            else Helper.DisplayError("Reactor is not running...");
         }
 
-        public void Restart()
+        public static void Restart()
         {
-
+            if (isRunning)
+            {
+                isRestarting = true;
+                Stop();
+                Start();
+                Console.WriteLine("Reactor restarted");
+                isRestarting = false;
+            }
+            else Helper.DisplayError("Reactor is not running...");
         }
 
     }
 
+
+
+    /*
     /// <summary>
     /// Service Node
     /// </summary>
     public class Node
     {
         private bool isRunning { get; set; } = false;
+        private bool isRestarting { get; set; } = false;
+        private static ZContext node_ctx { get; set; }
+        private static ZContext messenger_ctx { get; set; }
+        private ZSocket node { get; set; }
+        private ZSocket messenger { get; set; }
 
         public void Status()
         {
-
+            if (isRunning) Console.WriteLine("The reactor is: Running");
+            else Console.WriteLine("The reactor is: Stopped");
         }
 
         public void Start()
         {
-
+            if (!isRunning)
+            {
+                node_ctx = new ZContext();
+                messenger_ctx = new ZContext();
+                node = new ZSocket(node_ctx, ZSocketType.DEALER);
+                messenger = new ZSocket(messenger_ctx, ZSocketType.ROUTER);
+                // Bind both sockets to TCP ports
+                node.Bind("tcp://" + CustomConfig.GetSettings("reactor", "proxy")
+                    + ":" + CustomConfig.GetSettings("reactor", "proxy_port"));
+                messenger.Bind("tcp://" + CustomConfig.GetSettings("reactor", "messenger")
+                    + ":" + CustomConfig.GetSettings("reactor", "messenger_port"));
+                if (!isRestarting) Console.WriteLine("Reactor started");
+            }
+            else Helper.DisplayError("Reactor is already running...");
         }
 
         public void Stop()
         {
-
+            if (isRunning)
+            {
+                node.Close();
+                node_ctx.Terminate();
+                messenger.Close();
+                messenger_ctx.Terminate();
+                if (!isRestarting) Console.WriteLine("Reactor has been terminated");
+                isRunning = false;
+            }
+            else Helper.DisplayError("Reactor is not running...");
         }
 
         public void Restart()
         {
-
+            if (isRunning)
+            {
+                isRestarting = true;
+                Stop();
+                Start();
+                Console.WriteLine("Reactor restarted");
+                isRestarting = false;
+            }
+            else Helper.DisplayError("Reactor is not running...");
         }
 
     }
+    */
 }

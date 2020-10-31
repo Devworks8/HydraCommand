@@ -161,4 +161,97 @@ Config Level: The config you wish to access. [default|user]
             return 0;
         }
     }
+
+    public class NetworkCommand : ConsoleCommand
+    {
+        public string service { get; set; }
+        public string command { get; set; }
+
+        public NetworkCommand()
+        {
+            IsCommand("network", "Access network commands");
+            HasAdditionalArguments(2, " <Service> <Command>");
+        }
+
+        public override int? OverrideAfterHandlingArgumentsBeforeRun(string[] remainingArguments)
+        {
+            service = remainingArguments[0];
+            command = remainingArguments[1];
+
+            return base.OverrideAfterHandlingArgumentsBeforeRun(remainingArguments);
+        }
+
+        public override int Run(string[] remainingArguments)
+        {
+            if (service == "all")
+            {
+                if (command == "start")
+                {
+                    HydraNetwork.Proxy.Start();
+                    HydraNetwork.Reactor.Start();
+                    HydraNetwork.Messenger.Start();
+                }
+                else if (command == "stop")
+                {
+                    HydraNetwork.Proxy.Stop();
+                    HydraNetwork.Reactor.Stop();
+                    HydraNetwork.Messenger.Stop();
+                }
+                else if (command == "restart")
+                {
+                    HydraNetwork.Proxy.Restart();
+                    HydraNetwork.Reactor.Restart();
+                    HydraNetwork.Messenger.Restart();
+                }
+                else if (command == "status")
+                {
+                    HydraNetwork.Proxy.Status();
+                    HydraNetwork.Reactor.Status();
+                    HydraNetwork.Messenger.Status();
+                }
+                else
+                {
+                    Helper.DisplayError("Invalid command");
+                    return 1;
+                }
+            }
+            else if (service == "proxy")
+            {
+                if (command == "start") HydraNetwork.Proxy.Start();
+                else if (command == "stop") HydraNetwork.Proxy.Stop();
+                else if (command == "restart") HydraNetwork.Proxy.Restart();
+                else if (command == "status") HydraNetwork.Proxy.Status();
+                else
+                {
+                    Helper.DisplayError("Invalid command");
+                    return 1;
+                }
+            }
+            else if (service == "reactor")
+            {
+                if (command == "start") HydraNetwork.Reactor.Start();
+                else if (command == "stop") HydraNetwork.Reactor.Stop();
+                else if (command == "restart") HydraNetwork.Reactor.Restart();
+                else if (command == "status") HydraNetwork.Reactor.Status();
+                else
+                {
+                    Helper.DisplayError("Invalid command");
+                    return 1;
+                }
+            }
+            else if (service == "messenger")
+            {
+                if (command == "start") HydraNetwork.Messenger.Start();
+                else if (command == "stop") HydraNetwork.Messenger.Stop();
+                else if (command == "restart") HydraNetwork.Messenger.Restart();
+                else if (command == "status") HydraNetwork.Messenger.Status();
+                else
+                {
+                    Helper.DisplayError("Invalid command");
+                    return 1;
+                }
+            }
+            return 0;
+        }
+    }
 }

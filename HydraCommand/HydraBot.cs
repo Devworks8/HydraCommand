@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using HydraNetwork;
 
 namespace HydraCommand
 {
@@ -27,11 +28,14 @@ namespace HydraCommand
     {
         static Receiver r = new Receiver();
         static Invoker invoker = new Invoker();
+        //public static Proxy proxy = new Proxy();
+        //public static Reactor reactor = new Reactor();
+        //public static Messenger messenger = new Messenger();
 
 
         // List of valid commands to be created dynamically
         public static List<string> commandOptions =
-            new List<string> { "quit", "config", "help" };
+            new List<string> { "quit", "config", "help", "network" };
 
         // Hold the valid command objects in a Dictionary
         public static Dictionary<string, Command> validCommands =

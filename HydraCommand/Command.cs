@@ -63,4 +63,10 @@ namespace HydraCommand
         public override void Execute(string[] args) => Receiver.config(args);
     }
 
+    public class network : Command
+    {
+        public network(Receiver receiver) : base(receiver) { }
+        public override void Execute(string[] args) => Receiver.network(args);
+    }
+
 }
