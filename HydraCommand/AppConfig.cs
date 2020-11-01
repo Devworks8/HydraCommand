@@ -31,7 +31,7 @@ namespace HydraCommand
     public static class Sections
     {
         public static List<string> defaultSections =
-            new List<string> { "bot", "cfg" };
+            new List<string> { "bot", "cfg" , "proxy", "reactor", "messenger"};
 
         public static List<string> customSections =
             new List<string> { "bot", "proxy", "reactor", "messenger" };

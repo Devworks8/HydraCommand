@@ -20,7 +20,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using ZeroMQ;
+//using ZeroMQ;
+using NetMQ.Sockets;
+using MessageRouter.NetMQ;
 using HydraCommand;
 
 namespace HydraNetwork
@@ -32,13 +34,26 @@ namespace HydraNetwork
     {
         private static bool isRunning { get; set; } = false;
         private static bool isRestarting { get; set; } = false;
-        private static ZContext backend_ctx;
-        private static ZContext frontend_ctx;
-        private static ZSocket backend;
-        private static ZSocket frontend;
-
-        static Proxy() { }
-
+        private static DealerSocket frontend;
+        private static RouterSocket backend;
+        private static string frontendAddress
+        {
+            get
+            {
+                return "tcp://" + CustomConfig.GetSettings("proxy", "frontend")
+                    + ":" + CustomConfig.GetSettings("proxy", "frontend_port");
+            }
+        } 
+            
+        private static string backendAddress
+        {
+            get
+            {
+                return "tcp://" + CustomConfig.GetSettings("proxy", "backend")
+                    + ":" + CustomConfig.GetSettings("proxy", "backend_port");
+            }
+        }
+            
         public static void Status()
         {
             if (isRunning) Console.WriteLine("The proxy is: Running");
@@ -49,16 +64,15 @@ namespace HydraNetwork
         {
             if (!isRunning)
             {
-                backend_ctx = new ZContext();
-                frontend_ctx = new ZContext();
-                backend = new ZSocket(backend_ctx, ZSocketType.ROUTER);
-                frontend = new ZSocket(frontend_ctx, ZSocketType.DEALER);
-                // Bind both sockets to TCP ports
-                frontend.Bind("tcp://" + CustomConfig.GetSettings("proxy", "frontend")
-                    + ":" + CustomConfig.GetSettings("proxy", "frontend_port"));
-                backend.Bind("tcp://" + CustomConfig.GetSettings("proxy", "backend")
-                    + ":" + CustomConfig.GetSettings("proxy", "backend_port"));
-                if (!isRestarting) Console.WriteLine("Proxy started");
+                backend = new RouterSocket(backendAddress);
+                frontend = new DealerSocket();
+                frontend.Connect(frontendAddress);
+
+                if (!isRestarting)
+                {
+                    Console.WriteLine("Proxy started");
+                    isRunning = true;
+                }
             }
             else Helper.DisplayError("Proxy is already running...");
         }
@@ -67,10 +81,11 @@ namespace HydraNetwork
         {
             if (isRunning)
             {
-                backend.Close();
-                backend_ctx.Terminate();
-                frontend.Close();
-                frontend_ctx.Terminate();
+                backend.Unbind(backendAddress);
+                backend.Dispose();
+                frontend.Disconnect(frontendAddress);
+                frontend.Dispose();
+                
                 if (!isRestarting) Console.WriteLine("Proxy has been terminated");
                 isRunning = false;
             }
@@ -86,6 +101,7 @@ namespace HydraNetwork
                 Start();
                 Console.WriteLine("Proxy restarted");
                 isRestarting = false;
+                isRunning = true;
             }
             else Helper.DisplayError("Proxy is not running...");
         }
@@ -99,10 +115,25 @@ namespace HydraNetwork
     {
         private static bool isRunning { get; set; } = false;
         private static bool isRestarting { get; set; } = false;
-        private static ZContext reactor_ctx { get; set; }
-        private static ZContext node_ctx { get; set; }
-        private static ZSocket reactor { get; set; }
-        private static ZSocket node { get; set; }
+        private static DealerSocket reactor;
+        private static RouterSocket service;
+        private static string serviceAddress
+        {
+            get
+            {
+                return "tcp://" + CustomConfig.GetSettings("messenger", "service")
+                    + ":" + CustomConfig.GetSettings("messenger", "service_port");
+            }
+        }
+
+        private static string reactorAddress
+        {
+            get
+            {
+                return "tcp://" + CustomConfig.GetSettings("messenger", "reactor")
+                    + ":" + CustomConfig.GetSettings("messenger", "reactor_port");
+            }
+        }
 
         public static void Status()
         {
@@ -114,15 +145,10 @@ namespace HydraNetwork
         {
             if (!isRunning)
             {
-                reactor_ctx = new ZContext();
-                node_ctx = new ZContext();
-                node = new ZSocket(node_ctx, ZSocketType.ROUTER);
-                reactor = new ZSocket(reactor_ctx, ZSocketType.DEALER);
-                // Bind both sockets to TCP ports
-                node.Bind("tcp://" + CustomConfig.GetSettings("messenger", "node")
-                    + ":" + CustomConfig.GetSettings("messenger", "node_port"));
-                reactor.Bind("tcp://" + CustomConfig.GetSettings("messenger", "reactor")
-                    + ":" + CustomConfig.GetSettings("messenger", "reactor_port"));
+                service = new RouterSocket(serviceAddress);
+                reactor = new DealerSocket();
+                reactor.Connect(reactorAddress);
+                isRunning = true;
                 if (!isRestarting) Console.WriteLine("Messenger started");
             }
             else Helper.DisplayError("Messenger is already running...");
@@ -132,10 +158,10 @@ namespace HydraNetwork
         {
             if (isRunning)
             {
-                node.Close();
-                node_ctx.Terminate();
-                reactor.Close();
-                reactor_ctx.Terminate();
+                service.Unbind(serviceAddress);
+                service.Dispose();
+                reactor.Disconnect(reactorAddress);
+                reactor.Dispose();
                 if (!isRestarting) Console.WriteLine("Messenger has been terminated");
                 isRunning = false;
             }
@@ -151,6 +177,7 @@ namespace HydraNetwork
                 Start();
                 Console.WriteLine("Messenger restarted");
                 isRestarting = false;
+                isRunning = true;
             }
             else Helper.DisplayError("Messenger is not running...");
         }
@@ -164,10 +191,25 @@ namespace HydraNetwork
     {
         private static bool isRunning { get; set; } = false;
         private static bool isRestarting { get; set; } = false;
-        private static ZContext proxy_ctx { get; set; }
-        private static ZContext messenger_ctx { get; set; }
-        private static ZSocket proxy { get; set; }
-        private static ZSocket messenger { get; set; }
+        private static DealerSocket proxy;
+        private static RouterSocket messenger;
+        private static string proxyAddress
+        {
+            get
+            {
+                return "tcp://" + CustomConfig.GetSettings("reactor", "proxy")
+                    + ":" + CustomConfig.GetSettings("reactor", "proxy_port");
+            }
+        }
+
+        private static string messengerAddress
+        {
+            get
+            {
+                return "tcp://" + CustomConfig.GetSettings("reactor", "messenger")
+                    + ":" + CustomConfig.GetSettings("reactor", "messenger_port");
+            }
+        }
 
         public static void Status()
         {
@@ -179,15 +221,10 @@ namespace HydraNetwork
         {
             if (!isRunning)
             {
-                proxy_ctx = new ZContext();
-                messenger_ctx = new ZContext();
-                proxy = new ZSocket(proxy_ctx, ZSocketType.DEALER);
-                messenger = new ZSocket(messenger_ctx, ZSocketType.ROUTER);
-                // Bind both sockets to TCP ports
-                proxy.Bind("tcp://" + CustomConfig.GetSettings("reactor", "proxy")
-                    + ":" + CustomConfig.GetSettings("reactor", "proxy_port"));
-                messenger.Bind("tcp://" + CustomConfig.GetSettings("reactor", "messenger")
-                    + ":" + CustomConfig.GetSettings("reactor", "messenger_port"));
+                proxy = new DealerSocket(proxyAddress);
+                messenger = new RouterSocket();
+                messenger.Connect(messengerAddress);
+                isRunning = true;
                 if (!isRestarting) Console.WriteLine("Reactor started");
             }
             else Helper.DisplayError("Reactor is already running...");
@@ -197,10 +234,10 @@ namespace HydraNetwork
         {
             if (isRunning)
             {
-                proxy.Close();
-                proxy_ctx.Terminate();
-                messenger.Close();
-                messenger_ctx.Terminate();
+                proxy.Unbind(proxyAddress);
+                proxy.Dispose();
+                messenger.Disconnect(messengerAddress);
+                messenger.Dispose();
                 if (!isRestarting) Console.WriteLine("Reactor has been terminated");
                 isRunning = false;
             }
@@ -216,6 +253,7 @@ namespace HydraNetwork
                 Start();
                 Console.WriteLine("Reactor restarted");
                 isRestarting = false;
+                isRunning = true;
             }
             else Helper.DisplayError("Reactor is not running...");
         }
