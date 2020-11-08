@@ -30,9 +30,11 @@ namespace HydraCommand
 {
     public static class Sections
     {
+        // Predefine default config sections
         public static List<string> defaultSections =
             new List<string> { "bot", "cfg" , "proxy", "reactor", "messenger"};
 
+        // Predefine user config sections
         public static List<string> customSections =
             new List<string> { "bot", "proxy", "reactor", "messenger" };
     }
@@ -106,27 +108,8 @@ namespace HydraCommand
 
         public static string GetSettings(string section, string key)
         {
-            if (iniData[section][key] == "default")
-            {
-                return DefaultConfig.GetSettings(section, key);
-            }
-            else
-            {
-                return iniData[section][key];
-            }
-            /*
-            if (section.ToLower() == "bot" && key.ToLower() == "prompt")
-            {
-                if (iniData["bot"]["prompt"] != "default")
-                {
-                    return iniData["bot"]["prompt"];
-                }
-
-                return DefaultConfig.GetSettings("bot", "prompt");
-            }
-
-            return iniData[section][key];
-            */
+            if (iniData[section][key] == "default") return DefaultConfig.GetSettings(section, key);
+            else return iniData[section][key];
         }
 
         public static string GetSettings(string section)

@@ -187,27 +187,27 @@ Config Level: The config you wish to access. [default|user]
             {
                 if (command == "start")
                 {
-                    HydraNetwork.Proxy.Start();
-                    HydraNetwork.Reactor.Start();
-                    HydraNetwork.Messenger.Start();
+                    HydraBot.proxy.Start();
+                    HydraBot.reactor.Start();
+                    HydraBot.messenger.Start();
                 }
                 else if (command == "stop")
                 {
-                    HydraNetwork.Proxy.Stop();
-                    HydraNetwork.Reactor.Stop();
-                    HydraNetwork.Messenger.Stop();
+                    HydraBot.proxy.Stop();
+                    HydraBot.reactor.Stop();
+                    HydraBot.messenger.Stop();
                 }
                 else if (command == "restart")
                 {
-                    HydraNetwork.Proxy.Restart();
-                    HydraNetwork.Reactor.Restart();
-                    HydraNetwork.Messenger.Restart();
+                    HydraBot.proxy.Restart();
+                    HydraBot.reactor.Restart();
+                    HydraBot.messenger.Restart();
                 }
                 else if (command == "status")
                 {
-                    HydraNetwork.Proxy.Status();
-                    HydraNetwork.Reactor.Status();
-                    HydraNetwork.Messenger.Status();
+                    HydraBot.proxy.Status();
+                    HydraBot.reactor.Status();
+                    HydraBot.messenger.Status();
                 }
                 else
                 {
@@ -217,10 +217,10 @@ Config Level: The config you wish to access. [default|user]
             }
             else if (service == "proxy")
             {
-                if (command == "start") HydraNetwork.Proxy.Start();
-                else if (command == "stop") HydraNetwork.Proxy.Stop();
-                else if (command == "restart") HydraNetwork.Proxy.Restart();
-                else if (command == "status") HydraNetwork.Proxy.Status();
+                if (command == "start") HydraBot.proxy.Start();
+                else if (command == "stop") HydraBot.proxy.Stop();
+                else if (command == "restart") HydraBot.proxy.Restart();
+                else if (command == "status") HydraBot.proxy.Status();
                 else
                 {
                     Helper.DisplayError("Invalid command");
@@ -229,10 +229,10 @@ Config Level: The config you wish to access. [default|user]
             }
             else if (service == "reactor")
             {
-                if (command == "start") HydraNetwork.Reactor.Start();
-                else if (command == "stop") HydraNetwork.Reactor.Stop();
-                else if (command == "restart") HydraNetwork.Reactor.Restart();
-                else if (command == "status") HydraNetwork.Reactor.Status();
+                if (command == "start") HydraBot.reactor.Start();
+                else if (command == "stop") HydraBot.reactor.Stop();
+                else if (command == "restart") HydraBot.reactor.Restart();
+                else if (command == "status") HydraBot.reactor.Status();
                 else
                 {
                     Helper.DisplayError("Invalid command");
@@ -241,10 +241,10 @@ Config Level: The config you wish to access. [default|user]
             }
             else if (service == "messenger")
             {
-                if (command == "start") HydraNetwork.Messenger.Start();
-                else if (command == "stop") HydraNetwork.Messenger.Stop();
-                else if (command == "restart") HydraNetwork.Messenger.Restart();
-                else if (command == "status") HydraNetwork.Messenger.Status();
+                if (command == "start") HydraBot.messenger.Start();
+                else if (command == "stop") HydraBot.messenger.Stop();
+                else if (command == "restart") HydraBot.messenger.Restart();
+                else if (command == "status") HydraBot.messenger.Status();
                 else
                 {
                     Helper.DisplayError("Invalid command");

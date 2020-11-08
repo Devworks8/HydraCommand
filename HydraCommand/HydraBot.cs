@@ -20,7 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
-using HydraNetwork;
+using HydraCommand.Network;
 
 namespace HydraCommand
 {
@@ -28,10 +28,9 @@ namespace HydraCommand
     {
         static Receiver r = new Receiver();
         static Invoker invoker = new Invoker();
-        //public static Proxy proxy = new Proxy();
-        //public static Reactor reactor = new Reactor();
-        //public static Messenger messenger = new Messenger();
-
+        static public Proxy proxy = new Proxy();
+        static public Reactor reactor = new Reactor();
+        static public Messenger messenger = new Messenger();
 
         // List of valid commands to be created dynamically
         public static List<string> commandOptions =
@@ -75,20 +74,34 @@ namespace HydraCommand
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    // PadRight ensures that this line extends the width
-                    // of the console window so it erases itself each time
-                    Console.Write($"Error! '{input}' is not a valid response".PadRight(Console.WindowWidth));
-                    Console.ResetColor();
+                    //TODO: Try sending thru the network. Display error is invalid request
+                    try
+                    {
+                        var sendResponse = "";
 
-                    // Set cursor position to just after the promt again, write
-                    // a blank line, and reset the cursor one more time
-                    Console.SetCursorPosition(inputCursorLeft, inputCursorTop);
-                    Console.Write(new string(' ', input.Length));
-                    Console.SetCursorPosition(inputCursorLeft, inputCursorTop);
+                        if (null == null)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            // PadRight ensures that this line extends the width
+                            // of the console window so it erases itself each time
+                            Console.Write($"Error! '{input}' is not a valid response".PadRight(Console.WindowWidth));
+                            Console.ResetColor();
 
-                    input = Console.ReadLine();
-                    args = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                            // Set cursor position to just after the promt again, write
+                            // a blank line, and reset the cursor one more time
+                            Console.SetCursorPosition(inputCursorLeft, inputCursorTop);
+                            Console.Write(new string(' ', input.Length));
+                            Console.SetCursorPosition(inputCursorLeft, inputCursorTop);
+
+                            input = Console.ReadLine();
+                            args = input.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    
                 } 
             }
 
@@ -101,7 +114,6 @@ namespace HydraCommand
         {
             DefaultConfig.ParseDefaults();
             CustomConfig.LoadConfig(DefaultConfig.GetSettings("cfg", "path"));
-            //CustomConfig.ParseCustom();
 
             // Create command objects and assign to dictionary
             foreach (string command in commandOptions)

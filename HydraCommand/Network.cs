@@ -20,22 +20,21 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-//using ZeroMQ;
+using System.Threading.Tasks;
 using NetMQ.Sockets;
 using MessageRouter.NetMQ;
 using HydraCommand;
 
-namespace HydraNetwork
+namespace HydraCommand.Network
 {
     /// <summary>
     /// Receives requests from users and sends to Reactor
     /// </summary>
-    public static class Proxy
+    public class Proxy
     {
-        private static bool isRunning { get; set; } = false;
-        private static bool isRestarting { get; set; } = false;
-        private static DealerSocket frontend;
-        private static RouterSocket backend;
+        private bool isRunning { get; set; } = false;
+        private bool isRestarting { get; set; } = false;
+        private Task task;
         private static string frontendAddress
         {
             get
@@ -43,8 +42,7 @@ namespace HydraNetwork
                 return "tcp://" + CustomConfig.GetSettings("proxy", "frontend")
                     + ":" + CustomConfig.GetSettings("proxy", "frontend_port");
             }
-        } 
-            
+        }    
         private static string backendAddress
         {
             get
@@ -53,20 +51,22 @@ namespace HydraNetwork
                     + ":" + CustomConfig.GetSettings("proxy", "backend_port");
             }
         }
-            
-        public static void Status()
+        public static XSubscriberSocket frontend = new XSubscriberSocket(frontendAddress);
+        private static XPublisherSocket backend = new XPublisherSocket(backendAddress);
+        private NetMQ.Proxy proxy = new NetMQ.Proxy(frontend, backend);
+
+        public void Status()
         {
             if (isRunning) Console.WriteLine("The proxy is: Running");
             else Console.WriteLine("The proxy is: Stopped");
         }
 
-        public static void Start()
+        public void Start()
         {
             if (!isRunning)
             {
-                backend = new RouterSocket(backendAddress);
-                frontend = new DealerSocket();
-                frontend.Connect(frontendAddress);
+                //TODO: Need to keep working on the async implementation
+                Task.Run (() => proxy.Start(), TaskCreationOptions.LongRunning);
 
                 if (!isRestarting)
                 {
@@ -75,24 +75,22 @@ namespace HydraNetwork
                 }
             }
             else Helper.DisplayError("Proxy is already running...");
+
         }
 
-        public static void Stop()
+        public void Stop()
         {
             if (isRunning)
             {
-                backend.Unbind(backendAddress);
-                backend.Dispose();
-                frontend.Disconnect(frontendAddress);
-                frontend.Dispose();
-                
+                proxy.Stop();
+
                 if (!isRestarting) Console.WriteLine("Proxy has been terminated");
                 isRunning = false;
             }
             else Helper.DisplayError("Proxy is not running...");
         }
 
-        public static void Restart()
+        public void Restart()
         {
             if (isRunning)
             {
@@ -105,19 +103,18 @@ namespace HydraNetwork
             }
             else Helper.DisplayError("Proxy is not running...");
         }
-
     }
 
     /// <summary>
     /// Receives requests from Reactor and sends to Nodes
     /// </summary>
-    public static class Messenger
+    public class Messenger
     {
-        private static bool isRunning { get; set; } = false;
-        private static bool isRestarting { get; set; } = false;
-        private static DealerSocket reactor;
-        private static RouterSocket service;
-        private static string serviceAddress
+        private bool isRunning { get; set; } = false;
+        private bool isRestarting { get; set; } = false;
+        private DealerSocket reactor;
+        private RouterSocket service;
+        private string serviceAddress
         {
             get
             {
@@ -126,7 +123,7 @@ namespace HydraNetwork
             }
         }
 
-        private static string reactorAddress
+        private string reactorAddress
         {
             get
             {
@@ -135,13 +132,13 @@ namespace HydraNetwork
             }
         }
 
-        public static void Status()
+        public void Status()
         {
             if (isRunning) Console.WriteLine("The messenger is: Running");
             else Console.WriteLine("The messenger is: Stopped");
         }
 
-        public static void Start()
+        public void Start()
         {
             if (!isRunning)
             {
@@ -154,7 +151,7 @@ namespace HydraNetwork
             else Helper.DisplayError("Messenger is already running...");
         }
 
-        public static void Stop()
+        public void Stop()
         {
             if (isRunning)
             {
@@ -168,7 +165,7 @@ namespace HydraNetwork
             else Helper.DisplayError("Messenger is not running...");
         }
 
-        public static void Restart()
+        public void Restart()
         {
             if (isRunning)
             {
@@ -187,13 +184,13 @@ namespace HydraNetwork
     /// <summary>
     /// Receives requests from proxy and sends to Messenger
     /// </summary>
-    public static class Reactor
+    public class Reactor
     {
-        private static bool isRunning { get; set; } = false;
-        private static bool isRestarting { get; set; } = false;
-        private static DealerSocket proxy;
-        private static RouterSocket messenger;
-        private static string proxyAddress
+        private bool isRunning { get; set; } = false;
+        private bool isRestarting { get; set; } = false;
+        private DealerSocket proxy;
+        private RouterSocket messenger;
+        private string proxyAddress
         {
             get
             {
@@ -202,7 +199,7 @@ namespace HydraNetwork
             }
         }
 
-        private static string messengerAddress
+        private string messengerAddress
         {
             get
             {
@@ -211,13 +208,13 @@ namespace HydraNetwork
             }
         }
 
-        public static void Status()
+        public void Status()
         {
             if (isRunning) Console.WriteLine("The reactor is: Running");
             else Console.WriteLine("The reactor is: Stopped");
         }
 
-        public static void Start()
+        public void Start()
         {
             if (!isRunning)
             {
@@ -230,7 +227,7 @@ namespace HydraNetwork
             else Helper.DisplayError("Reactor is already running...");
         }
 
-        public static void Stop()
+        public void Stop()
         {
             if (isRunning)
             {
@@ -244,7 +241,7 @@ namespace HydraNetwork
             else Helper.DisplayError("Reactor is not running...");
         }
 
-        public static void Restart()
+        public void Restart()
         {
             if (isRunning)
             {
